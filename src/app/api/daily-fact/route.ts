@@ -60,7 +60,7 @@ export async function GET() {
       response_format: "b64_json",
     });
 
-    const b64 = imageResponse.data[0]?.b64_json;
+    const b64 = imageResponse.data?.[0]?.b64_json;
     if (!b64) {
       return NextResponse.json(
         { error: "No image generated" },
