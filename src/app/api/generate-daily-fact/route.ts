@@ -1,8 +1,8 @@
 import OpenAI from "openai";
 import { NextResponse } from "next/server";
 import { getTodayCentral } from "@/lib/date";
-import { getFactForDate, storeFactForDate, updateIndex } from "@/lib/db";
-import { FACT_SYSTEM_PROMPT, FACT_USER_PROMPT } from "@/lib/prompts";
+import { getFactForDate, getRecentFacts, storeFactForDate, updateIndex } from "@/lib/db";
+import { FACT_SYSTEM_PROMPT, buildFactUserPrompt } from "@/lib/prompts";
 import type { DailyFact } from "@/lib/types";
 
 export const maxDuration = 60;
@@ -23,13 +23,14 @@ export async function GET(request: Request) {
 
   try {
     const openai = new OpenAI();
+    const previousFacts = await getRecentFacts(30);
 
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       response_format: { type: "json_object" },
       messages: [
         { role: "system", content: FACT_SYSTEM_PROMPT },
-        { role: "user", content: FACT_USER_PROMPT },
+        { role: "user", content: buildFactUserPrompt(previousFacts) },
       ],
     });
 

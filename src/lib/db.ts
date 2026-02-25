@@ -74,6 +74,15 @@ export async function updateIndex(_date: string): Promise<void> {
   // No-op: dates are derived from the daily_facts table
 }
 
+export async function getRecentFacts(limit: number = 30): Promise<string[]> {
+  await ensureTable();
+  const result = await db.execute({
+    sql: "SELECT fact FROM daily_facts ORDER BY date DESC LIMIT ?",
+    args: [limit],
+  });
+  return result.rows.map((row) => row.fact as string);
+}
+
 export async function getImageBase64(date: string): Promise<string | null> {
   await ensureTable();
   const result = await db.execute({

@@ -1,12 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
 const mockGetFactForDate = vi.fn();
+const mockGetRecentFacts = vi.fn();
 const mockStoreFactForDate = vi.fn();
 const mockUpdateIndex = vi.fn();
 const mockGetTodayCentral = vi.fn();
 
 vi.mock("@/lib/db", () => ({
   getFactForDate: (...args: unknown[]) => mockGetFactForDate(...args),
+  getRecentFacts: (...args: unknown[]) => mockGetRecentFacts(...args),
   storeFactForDate: (...args: unknown[]) => mockStoreFactForDate(...args),
   updateIndex: (...args: unknown[]) => mockUpdateIndex(...args),
 }));
@@ -41,6 +43,7 @@ describe("GET /api/generate-daily-fact", () => {
     vi.stubEnv("CRON_SECRET", "test-secret");
     mockGetTodayCentral.mockReturnValue("2026-02-21");
     mockGetFactForDate.mockResolvedValue(null);
+    mockGetRecentFacts.mockResolvedValue([]);
     mockStoreFactForDate.mockResolvedValue(undefined);
     mockUpdateIndex.mockResolvedValue(undefined);
     mockChatCreate.mockReset();

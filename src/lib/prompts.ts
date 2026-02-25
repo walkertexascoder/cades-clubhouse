@@ -10,5 +10,13 @@ export const FACT_SYSTEM_PROMPT =
   "kid-friendly, no violence or weapons. Make it fun and silly). " +
   "Keep language simple and exciting for a 7-year-old.";
 
-export const FACT_USER_PROMPT =
-  "Give me a random fun fact about George Washington with a Star Wars comparison!";
+export function buildFactUserPrompt(previousFacts: string[] = []): string {
+  let prompt =
+    "Give me a random fun fact about George Washington with a Star Wars comparison!";
+  if (previousFacts.length > 0) {
+    prompt +=
+      "\n\nIMPORTANT: Do NOT repeat or rephrase any of these previously used facts:\n" +
+      previousFacts.map((f, i) => `${i + 1}. ${f}`).join("\n");
+  }
+  return prompt;
+}
