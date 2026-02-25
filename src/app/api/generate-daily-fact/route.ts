@@ -7,7 +7,7 @@ import type { DailyFact } from "@/lib/types";
 
 export const maxDuration = 60;
 
-export async function POST(request: Request) {
+export async function GET(request: Request) {
   const authHeader = request.headers.get("authorization");
   const expected = `Bearer ${process.env.CRON_SECRET}`;
   if (!authHeader || authHeader !== expected) {

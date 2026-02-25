@@ -25,7 +25,7 @@ vi.mock("openai", () => ({
   },
 }));
 
-import { POST } from "./route";
+import { GET } from "./route";
 
 function makeRequest(secret: string | null = "test-secret") {
   const headers: Record<string, string> = {};
@@ -36,7 +36,7 @@ function makeRequest(secret: string | null = "test-secret") {
   });
 }
 
-describe("POST /api/generate-daily-fact", () => {
+describe("GET /api/generate-daily-fact", () => {
   beforeEach(() => {
     vi.stubEnv("CRON_SECRET", "test-secret");
     mockGetTodayCentral.mockReturnValue("2026-02-21");
@@ -48,12 +48,12 @@ describe("POST /api/generate-daily-fact", () => {
   });
 
   it("returns 401 without authorization header", async () => {
-    const res = await POST(makeRequest(null));
+    const res = await GET(makeRequest(null));
     expect(res.status).toBe(401);
   });
 
   it("returns 401 with wrong secret", async () => {
-    const res = await POST(makeRequest("wrong-secret"));
+    const res = await GET(makeRequest("wrong-secret"));
     expect(res.status).toBe(401);
   });
 
@@ -63,7 +63,7 @@ describe("POST /api/generate-daily-fact", () => {
       fact: "existing",
     });
 
-    const res = await POST(makeRequest());
+    const res = await GET(makeRequest());
     const data = await res.json();
     expect(data.message).toBe("Already generated");
     expect(mockChatCreate).not.toHaveBeenCalled();
@@ -84,7 +84,7 @@ describe("POST /api/generate-daily-fact", () => {
       data: [{ b64_json: "AAAA" }],
     });
 
-    const res = await POST(makeRequest());
+    const res = await GET(makeRequest());
     const data = await res.json();
 
     expect(res.status).toBe(200);
@@ -99,7 +99,7 @@ describe("POST /api/generate-daily-fact", () => {
       choices: [{ message: { content: null } }],
     });
 
-    const res = await POST(makeRequest());
+    const res = await GET(makeRequest());
     expect(res.status).toBe(502);
   });
 
@@ -119,14 +119,14 @@ describe("POST /api/generate-daily-fact", () => {
     });
     mockImagesGenerate.mockResolvedValue({ data: [{}] });
 
-    const res = await POST(makeRequest());
+    const res = await GET(makeRequest());
     expect(res.status).toBe(502);
   });
 
   it("returns 500 when OpenAI throws", async () => {
     mockChatCreate.mockRejectedValue(new Error("API down"));
 
-    const res = await POST(makeRequest());
+    const res = await GET(makeRequest());
     expect(res.status).toBe(500);
   });
 });
