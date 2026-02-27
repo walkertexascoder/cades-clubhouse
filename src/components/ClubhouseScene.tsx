@@ -4,8 +4,9 @@ import { useCallback, useRef, useState } from "react";
 import ClubhouseView from "./ClubhouseView";
 import FactsView from "./FactsView";
 import LoadingView from "./LoadingView";
+import MazeView from "./MazeView";
 
-type ViewState = "clubhouse" | "loading" | "facts";
+type ViewState = "clubhouse" | "loading" | "facts" | "maze";
 
 export default function ClubhouseScene() {
   const [view, setView] = useState<ViewState>("clubhouse");
@@ -16,6 +17,9 @@ export default function ClubhouseScene() {
 
   const clickCountRef = useRef(0);
   const clickTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const titleClickCountRef = useRef(0);
+  const titleClickTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const handleTripleClick = useCallback(
     (onTriggered: () => void) => {
@@ -69,7 +73,29 @@ export default function ClubhouseScene() {
     });
   }, [handleTripleClick]);
 
+  const handleTitleTripleClick = useCallback(() => {
+    titleClickCountRef.current += 1;
+    if (titleClickCountRef.current === 3) {
+      titleClickCountRef.current = 0;
+      if (titleClickTimerRef.current) {
+        clearTimeout(titleClickTimerRef.current);
+        titleClickTimerRef.current = null;
+      }
+      setView("maze");
+      return;
+    }
+    if (titleClickTimerRef.current) clearTimeout(titleClickTimerRef.current);
+    titleClickTimerRef.current = setTimeout(() => {
+      titleClickCountRef.current = 0;
+      titleClickTimerRef.current = null;
+    }, 500);
+  }, []);
+
   const showFacts = view === "facts";
+
+  if (view === "maze") {
+    return <MazeView onBack={() => setView("clubhouse")} />;
+  }
 
   return (
     <div className="relative overflow-hidden">
@@ -82,7 +108,10 @@ export default function ClubhouseScene() {
           {view === "loading" ? (
             <LoadingView />
           ) : (
-            <ClubhouseView onTripleClick={handleClubhouseTripleClick} />
+            <ClubhouseView
+              onTripleClick={handleClubhouseTripleClick}
+              onTitleTripleClick={handleTitleTripleClick}
+            />
           )}
         </div>
         <div className="w-1/2">
@@ -93,6 +122,7 @@ export default function ClubhouseScene() {
               imageUrl={imageUrl}
               date={date}
               onTripleClick={handleFactsTripleClick}
+              onBack={() => setView("clubhouse")}
             />
           )}
         </div>

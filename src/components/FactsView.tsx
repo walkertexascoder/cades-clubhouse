@@ -6,6 +6,7 @@ interface FactsViewProps {
   imageUrl: string | null;
   date?: string;
   onTripleClick: () => void;
+  onBack: () => void;
 }
 
 export default function FactsView({
@@ -14,6 +15,7 @@ export default function FactsView({
   imageUrl,
   date,
   onTripleClick,
+  onBack,
 }: FactsViewProps) {
   return (
     <div
@@ -51,13 +53,21 @@ export default function FactsView({
         )}
       </div>
 
-      <Link
-        href="/archive"
-        className="mt-6 text-sm font-semibold text-purple-600 underline hover:text-purple-800"
-        onClick={(e) => e.stopPropagation()}
-      >
-        See past facts
-      </Link>
+      <div className="mt-6 flex gap-3">
+        <Link
+          href="/archive"
+          className="px-4 py-2 rounded-xl bg-purple-100 text-purple-700 font-semibold hover:bg-purple-200 transition-all"
+          onClick={(e) => e.stopPropagation()}
+        >
+          See past facts
+        </Link>
+        <button
+          onClick={(e) => { e.stopPropagation(); onBack(); }}
+          className="px-4 py-2 rounded-xl bg-gray-100 text-gray-600 font-semibold hover:bg-gray-200 transition-all"
+        >
+          ← Back
+        </button>
+      </div>
     </div>
   );
 }
